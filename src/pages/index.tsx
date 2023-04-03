@@ -7,8 +7,11 @@ import {
 } from "@clerk/nextjs";
 import { type NextPage } from "next";
 import Head from "next/head";
+import { api } from "~/utils/api";
 
 const Home: NextPage = () => {
+  const { data } = api.post.getAll.useQuery();
+
   return (
     <>
       <Head>
@@ -17,12 +20,15 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c]">
-        <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
+        <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 text-zinc-50">
           <h1>My App</h1>
           <SignedIn>
             {/* Mount the UserButton component */}
             <UserButton />
             <SignOutButton />
+            {data?.map((post) => (
+              <div key={post.id}>{post.content}</div>
+            ))}
           </SignedIn>
           <SignedOut>
             {/* Signed out users get sign in button */}
