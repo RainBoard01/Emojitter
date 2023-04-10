@@ -6,6 +6,7 @@ import { api } from "~/utils/api";
 import type { RouterOutputs } from "~/utils/api";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { LoadingPage } from "~/components/loading";
 
 dayjs.extend(relativeTime);
 
@@ -55,14 +56,26 @@ const PostView = (props: PostWithUser) => {
   );
 };
 
-const Home: NextPage = () => {
+const Feed = () => {
   const { data, isLoading, isError } = api.posts.getAll.useQuery();
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <LoadingPage />;
 
   if (isError) return <div>Something went wrong</div>;
 
   if (!data) return <div>No data</div>;
+
+  return (
+    <div className="flex flex-col">
+      {data.map((fullPost) => (
+        <PostView {...fullPost} key={fullPost.post.id} />
+      ))}
+    </div>
+  );
+};
+
+const Home: NextPage = () => {
+  api.posts.getAll.useQuery();
 
   return (
     <>
@@ -78,11 +91,7 @@ const Home: NextPage = () => {
             <div className="flex justify-between border-b border-slate-400 p-4">
               <CreatePostWizard />
             </div>
-            <div className="flex flex-col">
-              {data.map((fullPost) => (
-                <PostView {...fullPost} key={fullPost.post.id} />
-              ))}
-            </div>
+            <Feed />
           </SignedIn>
           <SignedOut>
             {/* Signed out users get sign in button */}
