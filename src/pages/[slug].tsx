@@ -1,5 +1,9 @@
 import type { GetStaticProps, NextPage } from "next";
 import Head from "next/head";
+import { PageLayout } from "~/components/layout";
+import Image from "next/image";
+import { Feed } from "~/components/feed";
+import { generateSSGHelper } from "~/server/helpers/ssgHelper";
 import { api } from "~/utils/api";
 
 const ProfilePage: NextPage<{ slug: string }> = ({ slug }) => {
@@ -11,7 +15,7 @@ const ProfilePage: NextPage<{ slug: string }> = ({ slug }) => {
     data: posts,
     isLoading: isPostsLoading,
     isError: isPostsError,
-  } = api.posts.getPostsByUserId.useQuery({
+  } = api.posts.getAllByUserId.useQuery({
     userId: profile?.id ?? "",
   });
 
@@ -54,20 +58,8 @@ const ProfilePage: NextPage<{ slug: string }> = ({ slug }) => {
   );
 };
 
-import { createServerSideHelpers } from "@trpc/react-query/server";
-import { appRouter } from "~/server/api/root";
-import { prisma } from "~/server/db";
-import SuperJSON from "superjson";
-import { PageLayout } from "~/components/layout";
-import Image from "next/image";
-import { Feed } from "~/components/feed";
-
 export const getStaticProps: GetStaticProps = async (context) => {
-  const ssg = createServerSideHelpers({
-    router: appRouter,
-    ctx: { prisma, userId: null },
-    transformer: SuperJSON,
-  });
+  const ssg = generateSSGHelper();
   const slug = context.params?.slug;
 
   if (typeof slug !== "string") throw new Error("no slug");

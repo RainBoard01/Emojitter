@@ -54,7 +54,7 @@ export const postsRouter = createTRPCRouter({
     });
   }),
 
-  getPostsByUserId: publicProcedure
+  getAllByUserId: publicProcedure
     .input(
       z.object({
         userId: z.string(),
@@ -69,6 +69,29 @@ export const postsRouter = createTRPCRouter({
         orderBy: [{ createdAt: "desc" }],
       })
     ),
+  getOneById: publicProcedure
+    .input(
+      z.object({
+        postId: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const post = await ctx.prisma.post.findUnique({
+        where: {
+          id: input.postId,
+        },
+      });
+      if (!post)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Post not found",
+        });
+      const user = await clerkClient.users.getUser(post?.createdBy ?? "");
+      return {
+        post,
+        author: filterUserForClient(user),
+      };
+    }),
 
   create: privateProcedure
     .input(
