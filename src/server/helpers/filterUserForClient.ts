@@ -2,7 +2,7 @@ import type { User } from "@clerk/nextjs/dist/api";
 
 export const filterUserForClient = (user: User) => ({
   id: user.id,
-  username: user.username,
+  username: user.username ?? "",
   profileImageUrl: user.profileImageUrl,
   fullName: `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim(),
 });

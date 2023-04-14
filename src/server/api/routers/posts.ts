@@ -1,4 +1,3 @@
-import type { User } from "@clerk/nextjs/dist/api";
 import { clerkClient } from "@clerk/nextjs/server";
 import { TRPCError } from "@trpc/server";
 import { Ratelimit } from "@upstash/ratelimit";
@@ -54,6 +53,22 @@ export const postsRouter = createTRPCRouter({
       };
     });
   }),
+
+  getPostsByUserId: publicProcedure
+    .input(
+      z.object({
+        userId: z.string(),
+      })
+    )
+    .query(({ ctx, input }) =>
+      ctx.prisma.post.findMany({
+        where: {
+          createdBy: input.userId,
+        },
+        take: 100,
+        orderBy: [{ createdAt: "desc" }],
+      })
+    ),
 
   create: privateProcedure
     .input(

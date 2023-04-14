@@ -3,22 +3,30 @@ import Head from "next/head";
 import { api } from "~/utils/api";
 
 const ProfilePage: NextPage<{ slug: string }> = ({ slug }) => {
-  const { data } = api.profile.getUserByUsername.useQuery({
+  const { data: profile } = api.profile.getUserByUsername.useQuery({
     username: slug,
   });
 
-  if (!data) return <div>404</div>;
+  const {
+    data: posts,
+    isLoading: isPostsLoading,
+    isError: isPostsError,
+  } = api.posts.getPostsByUserId.useQuery({
+    userId: profile?.id ?? "",
+  });
+
+  if (!profile) return <div>404</div>;
 
   return (
     <>
       <Head>
-        <title>{data.username}</title>
+        <title>{profile.username}</title>
       </Head>
       <PageLayout>
         <div className="relative h-40 bg-slate-600">
           <Image
-            src={data.profileImageUrl}
-            alt={`${data.username ?? ""}'s profile pic`}
+            src={profile.profileImageUrl}
+            alt={`${profile.username ?? ""}'s profile pic`}
             width={128}
             height={128}
             className="absolute bottom-0 left-0 -mb-[64px] ml-4 rounded-full border-4 border-black bg-black"
@@ -26,11 +34,21 @@ const ProfilePage: NextPage<{ slug: string }> = ({ slug }) => {
         </div>
         <div className="h-[64px]"></div>
         <div className="w-full border-b border-slate-400 p-5">
-          <div className="text-xl font-extrabold">{data.fullName}</div>
+          <div className="text-xl font-extrabold">{profile.fullName}</div>
           <div className="text-md text-slate-400">{`@${
-            data.username ?? ""
+            profile.username ?? ""
           }`}</div>
         </div>
+        <Feed
+          posts={
+            posts?.map((post) => ({
+              post: post,
+              author: profile,
+            })) || undefined
+          }
+          isLoading={isPostsLoading}
+          isError={isPostsError}
+        />
       </PageLayout>
     </>
   );
@@ -42,6 +60,7 @@ import { prisma } from "~/server/db";
 import SuperJSON from "superjson";
 import { PageLayout } from "~/components/layout";
 import Image from "next/image";
+import { Feed } from "~/components/feed";
 
 export const getStaticProps: GetStaticProps = async (context) => {
   const ssg = createServerSideHelpers({
