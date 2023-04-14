@@ -21,14 +21,19 @@ type feedProps = {
 export const Feed = (props: feedProps) => {
   const { posts, isLoading, isError } = props;
 
-  if (isLoading) return <LoadingPage />;
+  if (isLoading)
+    return (
+      <div className="flex grow">
+        <LoadingPage />
+      </div>
+    );
 
   if (isError) return <div>Something went wrong</div>;
 
   if (!posts) return <div>No data</div>;
 
   return (
-    <div className="flex flex-col">
+    <div className="flex grow flex-col overflow-y-auto">
       {posts.map((fullPost) => (
         <PostView {...fullPost} key={fullPost.post.id} />
       ))}

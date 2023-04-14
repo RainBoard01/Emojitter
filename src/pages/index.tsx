@@ -10,15 +10,15 @@ const Home: NextPage = () => {
 
   return (
     <PageLayout>
-      <SignedIn>
-        <div className="flex justify-between border-b border-slate-400 p-4">
+      <div className="flex justify-between border-b border-slate-400 p-4">
+        <SignedIn>
           <CreatePostWizard />
-        </div>
-        <Feed posts={data} isLoading={isLoading} isError={isError} />
-      </SignedIn>
-      <SignedOut>
-        <SignInButton />
-      </SignedOut>
+        </SignedIn>
+        <SignedOut>
+          <SignInButton />
+        </SignedOut>
+      </div>
+      <Feed posts={data} isLoading={isLoading} isError={isError} />
     </PageLayout>
   );
 };
