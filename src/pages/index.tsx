@@ -6,19 +6,19 @@ import { Feed } from "~/components/feed";
 import { CreatePostWizard } from "~/components/createPostWizard";
 
 const Home: NextPage = () => {
-  //const { data, isLoading, isError } = api.posts.getAll.useQuery();
+  const { data, isLoading, isError } = api.posts.getAll.useQuery();
 
   return (
     <PageLayout>
       <div className="flex justify-between border-b border-slate-400 p-4">
         <SignedIn>
           <CreatePostWizard />
-          {/* <Feed posts={data} isLoading={isLoading} isError={isError} /> */}
         </SignedIn>
         <SignedOut>
           <SignInButton />
         </SignedOut>
       </div>
+      <Feed posts={data} isLoading={isLoading} isError={isError} />
     </PageLayout>
   );
 };
