@@ -1,9 +1,25 @@
-import { api } from "~/utils/api";
 import { LoadingPage } from "./loading";
 import { PostView } from "./postview";
+import type { Post } from "@prisma/client";
 
-export const Feed = () => {
-  const { data: posts, isLoading, isError } = api.posts.getAll.useQuery();
+type feedProps = {
+  posts:
+    | {
+        post: Post;
+        author: {
+          username: string;
+          id: string;
+          profileImageUrl: string;
+          fullName: string;
+        };
+      }[]
+    | undefined;
+  isLoading: boolean;
+  isError: boolean;
+};
+
+export const Feed = (props: feedProps) => {
+  const { posts, isLoading, isError } = props;
 
   if (isLoading)
     return (
